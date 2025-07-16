@@ -17,6 +17,26 @@ ansible-project/
 └── README.md                    # This file
 ```
 
+## Quick Start Guide
+
+### Step 1: Install Prerequisites
+1. Install Ansible on your control machine
+2. Ensure Python is installed on target Windows machines
+3. Configure WinRM (see Configuration section for details)
+
+### Step 2: Clone and Configure
+1. Clone this repository
+2. Navigate to the project directory
+3. Update inventory/hosts with your target machines
+4. Modify group_vars/windows_hosts.yml as needed
+
+### Step 3: Test Connection
+```bash
+ansible windows_hosts -m win_ping
+
+### Step 4: Run Installation
+ansible-playbook playbooks/install-spotify.yml
+
 ## Prerequisites
 
 1. **Ansible installed** on your control machine
