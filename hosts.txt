@@ -1,0 +1,14 @@
+[windows_hosts]
+localhost ansible_connection=local ansible_python_interpreter=python3
+
+[windows_hosts:vars]
+ansible_user=your_username
+ansible_password=your_password
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_port=5985
+
+# For local Windows execution (if running Ansible on Windows)
+[local]
+localhost ansible_connection=local
