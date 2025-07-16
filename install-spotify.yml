@@ -1,0 +1,73 @@
+---
+- name: Download and Install Spotify on Windows
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  
+  vars:
+    spotify_url: "https://download.scdn.co/SpotifySetup.exe"
+    download_path: "{{ ansible_env.TEMP | default('C:\\temp') }}\\SpotifySetup.exe"
+    install_path: "C:\\Program Files\\Spotify"
+    
+  tasks:
+    - name: Create temporary download directory
+      win_file:
+        path: "{{ ansible_env.TEMP | default('C:\\temp') }}"
+        state: directory
+      when: ansible_os_family == "Windows"
+
+    - name: Download Spotify installer
+      win_get_url:
+        url: "{{ spotify_url }}"
+        dest: "{{ download_path }}"
+        timeout: 300
+      register: download_result
+      when: ansible_os_family == "Windows"
+
+    - name: Check if Spotify is already installed
+      win_stat:
+        path: "{{ install_path }}\\Spotify.exe"
+      register: spotify_installed
+      when: ansible_os_family == "Windows"
+
+    - name: Install Spotify silently
+      win_command: "{{ download_path }} /S"
+      when: 
+        - ansible_os_family == "Windows"
+        - download_result is succeeded
+        - not spotify_installed.stat.exists
+      register: install_result
+
+    - name: Wait for installation to complete
+      win_wait_for:
+        path: "{{ install_path }}\\Spotify.exe"
+        timeout: 120
+      when: 
+        - ansible_os_family == "Windows"
+        - install_result is changed
+
+    - name: Clean up installer file
+      win_file:
+        path: "{{ download_path }}"
+        state: absent
+      when: ansible_os_family == "Windows"
+
+    - name: Display installation status
+      debug:
+        msg: "Spotify installation completed successfully!"
+      when: 
+        - ansible_os_family == "Windows"
+        - install_result is succeeded or spotify_installed.stat.exists
+
+    # Alternative for Linux/macOS systems
+    - name: Download Spotify for non-Windows systems
+      get_url:
+        url: "{{ spotify_url }}"
+        dest: "/tmp/SpotifySetup.exe"
+        mode: '0755'
+      when: ansible_os_family != "Windows"
+      
+    - name: Notify about manual installation for non-Windows
+      debug:
+        msg: "Spotify installer downloaded to /tmp/SpotifySetup.exe. Please install manually or use wine."
+      when: ansible_os_family != "Windows"
