@@ -22,20 +22,42 @@ ansible-project/
 ### Step 1: Install Prerequisites
 1. Install Ansible on your control machine
 2. Ensure Python is installed on target Windows machines
-3. Configure WinRM (see Configuration section for details)
+3. Configure network access for downloading Spotify installer
 
-### Step 2: Clone and Configure
-1. Clone this repository
-2. Navigate to the project directory
-3. Update inventory/hosts with your target machines
-4. Modify group_vars/windows_hosts.yml as needed
+### Step 2: Clone and Setup
+1. Clone this repository to your local machine
+2. Navigate to the project directory:
+   ```bash
+   cd ansible-project
+   ```
 
-### Step 3: Test Connection
+### Step 3: Configure Target Hosts
+1. Update `inventory/hosts` with your target Windows machines
+2. Modify `inventory/group_vars/windows_hosts.yml` with appropriate credentials
+3. For remote execution, configure WinRM on target machines (see Configuration section)
+
+### Step 4: Test Connection
 ```bash
-ansible windows_hosts -m win_ping
+# Test local connection
+ansible localhost -m ping
 
-### Step 4: Run Installation
+# Test Windows hosts (for remote execution)
+ansible windows_hosts -m win_ping
+```
+
+### Step 5: Run Spotify Installation
+```bash
+# Run the playbook locally
 ansible-playbook playbooks/install-spotify.yml
+
+# Run on specific hosts
+ansible-playbook -i inventory/hosts playbooks/install-spotify.yml -l windows_hosts
+```
+
+### Step 6: Verify Installation
+Check that Spotify has been installed successfully on your target machines.
+
+---
 
 ## Prerequisites
 
